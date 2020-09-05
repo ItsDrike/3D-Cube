@@ -1,0 +1,2 @@
+class DimensionError(Exception):
+    pass
