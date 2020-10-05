@@ -13,9 +13,11 @@ flake8-string-format = "~=0.2"
 flake8-tidy-imports = "~=4.0"
 pep8-naming = "~=0.9"
 pre-commit = "~=2.1"
+ipython = "~=7.18.1"
 
 [packages]
 pygame = "~=1.9"
+loguru = "~=0.5.3"
 
 [requires]
 python_version = "3.8"
