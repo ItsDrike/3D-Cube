@@ -2,10 +2,8 @@ from contextlib import suppress
 
 import pygame
 
+from src.config import Window
 from src.util import Colors
-
-WIDTH, HEIGHT = 1200, 900
-TICK_RATE = 100
 
 
 class Game:
@@ -34,8 +32,6 @@ class Game:
         """
         self.screen.fill(Colors.GREY)
 
-        # TODO: Main drawing
-
     def update_screen(self, tick: bool = True) -> None:
         """
         Update the screen accordingly to `redraw_screen`
@@ -58,7 +54,7 @@ class Game:
             self.update_screen()
 
 
-game = Game(WIDTH, HEIGHT, TICK_RATE)
+game = Game(Window.width, Window.height, Window.tick_rate)
 
 with suppress(KeyboardInterrupt):
     game.main()

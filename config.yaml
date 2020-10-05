@@ -1,0 +1,5 @@
+window:
+    height: 1200
+    width: 900
+    tick_rate: 100
+
