@@ -1,6 +1,7 @@
 from contextlib import suppress
 
 import pygame
+from loguru import logger
 
 from src.config import Window
 from src.util import Colors
@@ -49,6 +50,9 @@ class Game:
             self.fps_clock.tick(self.tick_rate)
 
     def main(self) -> None:
+        # Initial setup
+        logger.info("Starting game")
+
         # Main game loop
         while self.running:
             self.update_screen()
@@ -59,5 +63,5 @@ game = Game(Window.width, Window.height, Window.tick_rate)
 with suppress(KeyboardInterrupt):
     game.main()
 
-print("\nStopped")
+logger.info("Game Stopped")
 pygame.quit()
