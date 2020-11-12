@@ -12,7 +12,7 @@ class Game:
         self.size = self.width, self.height = width, height
 
         pygame.init()
-        self.screen = pygame.display.set_mode(self.size)
+        self.surface = pygame.display.set_mode(self.size)
         self.fps_clock = pygame.time.Clock()
         self.tick_rate = fps
 
@@ -31,7 +31,7 @@ class Game:
 
         This does not update the screen, it only redraws it.
         """
-        self.screen.fill(Colors.GREY)
+        self.surface.fill(Colors.GREY)
 
     def update_screen(self, tick: bool = True) -> None:
         """
