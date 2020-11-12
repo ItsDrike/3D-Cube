@@ -25,6 +25,3 @@ python_version = "3.8"
 [scripts]
 start = "python -m src"
 lint = "pre-commit run --all-files"
-test = "coverage run -m unittest"
-html = "coverage html"
-report = "coverage report"

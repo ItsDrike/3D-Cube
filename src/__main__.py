@@ -27,7 +27,7 @@ class Game:
 
     def redraw_screen(self) -> None:
         """
-        Redraw all cells on the screen.
+        Redraw everything on the screen.
 
         This does not update the screen, it only redraws it.
         """

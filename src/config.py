@@ -1,5 +1,9 @@
+import os
 import yaml
 from loguru import logger
+
+
+DEV_MODE = os.getenv("DEV_MODE") == 1
 
 with open("config.yaml") as file:
     config = yaml.full_load(file)
