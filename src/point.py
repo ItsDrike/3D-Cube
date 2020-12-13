@@ -13,6 +13,31 @@ class Point2D:
 
         self.matrix = Matrix([[x], [y]])
 
+    def __setattr__(self, name: str, value: t.Any) -> None:
+        """
+        In case attributes `x` or `y` are reset, make sure to also
+        reset the internal `matrix` attribute to match them.
+
+        In case `matrix` is reset, make sure to also reset the internal
+        `x` and `y` attributes to match it.
+        """
+        if all((
+            name in ("x", "y"),
+            hasattr(self, "x"), hasattr(self, "y")
+        )):
+            super().__setattr__("matrix", Matrix([[self.x], [self.y]]))
+
+        if name == "matrix":
+            if not isinstance(value, Matrix):
+                raise TypeError(f"`matrix` parameter must be an instance of `{Matrix.__class__}`")
+            if value.shape != (2, 1):
+                raise ValueError(f"Dimensions of `matrix` parameter must be (2, 1), not {value.shape}")
+
+            super().__setattr__("x", value[0, 0])
+            super().__setattr__("y", value[1, 0])
+
+        super().__setattr__(name, value)
+
     def draw(
         self,
         surface: pygame.Surface,
@@ -36,14 +61,18 @@ class Point2D:
         pos = [self.x * scale + position[0], self.y * scale + position[1]]
         pygame.draw.circle(surface, color, pos, size)
 
-    def __setattr__(self, name: str, value: t.Any) -> None:
-        super().__setattr__(name, value)
+    def rotate(self, clockwise: bool, angle: NUMBER, origin: "Point2D" = None) -> "Point2D":
+        """
+        Rotate point `clockwise` with specified `angle`.
+        In case you want to use different origin than (0, 0),
+        you can specify `origin` which will be a `Point2D` object.
+        """
+        if origin is None:
+            origin = self.__class__(x=0, y=0)
 
-        if all((
-            name in ("x", "y"),
-            hasattr(self, "x"), hasattr(self, "y")
-        )):
-            self.matrix = Matrix([[self.x], [self.y]])
+        rotation_matrix = Matrix.get_2d_rotation_matrix(clockwise, angle)
+        rotated_matrix = rotation_matrix * (self.matrix - origin.matrix) + origin.matrix
+        return self.__class__(rotated_matrix[0, 0], rotated_matrix[1, 0])
 
     def __repr__(self) -> str:
         return f"<2D Point (x={self.x},y={self.y})>"
@@ -61,6 +90,9 @@ class Point3D:
         """
         In case attributes `x`/`y`/`z` are reset, make sure to also
         reset the internal `matrix` attribute to match them.
+
+        In case `matrix` is reset, make sure to also reset the internal
+        `x`, `y` and `z` attributes to match it.
         """
         super().__setattr__(name, value)
 
@@ -68,7 +100,19 @@ class Point3D:
             name in ("x", "y", "z"),
             hasattr(self, "x"), hasattr(self, "y"), hasattr(self, "z")
         )):
-            self.matrix = Matrix([[self.x], [self.y], [self.z]])
+            super().__setattr__("matrix", Matrix([[self.x], [self.y], [self.z]]))
+
+        if name == "matrix":
+            if not isinstance(value, Matrix):
+                raise TypeError(f"`matrix` parameter must be an instance of `{Matrix.__class__}`")
+            if value.shape != (3, 1):
+                raise ValueError(f"Dimensions of `matrix` parameter must be (3, 1), not {value.shape}")
+
+            super().__setattr__("x", value[0, 0])
+            super().__setattr__("y", value[1, 0])
+            super().__setattr__("z", value[2, 0])
+
+        super().__setattr__(name, value)
 
     def project(self, scale: NUMBER = 1) -> Point2D:
         """
@@ -99,6 +143,19 @@ class Point3D:
         """
         perspective_scale = 1 / (distance - self.z)
         return self.project(scale=perspective_scale)
+
+    def rotate(self, axis: t.Literal["x", "y", "z"], angle: NUMBER, origin: "Point3D" = None) -> "Point3D":
+        """
+        Rotate point along given `axis` with specified `angle`.
+        In case you want to use different origin than (0, 0, 0),
+        you can specify `origin` which will be a `Point3D` object.
+        """
+        if origin is None:
+            origin = self.__class__(x=0, y=0, z=0)
+
+        rotation_matrix = Matrix.get_3d_rotation_matrix(axis, angle)
+        rotated_matrix = rotation_matrix * (self.matrix - origin.matrix) + origin.matrix
+        return self.__class__(rotated_matrix[0, 0], rotated_matrix[1, 0], rotated_matrix[2, 0])
 
     def __repr__(self) -> str:
         return f"<3D Point (x={self.x},y={self.y},z={self.z})>"
