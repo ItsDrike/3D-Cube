@@ -1,4 +1,5 @@
 import typing as t
+from math import pi
 
 import pygame
 
@@ -38,28 +39,63 @@ class Point2D:
 
         super().__setattr__(name, value)
 
+    def adjusted(self, center: "Point2D" = None, scale: NUMBER = 1) -> t.Tuple[NUMBER, NUMBER]:
+        """
+        Adjust given point by using `center` as a true center position of given point.
+        This is here because pygame center isn't a true screen center (to obtain true
+        center position in pygame, use Point2D(WIDTH//2, HEIGHT//2)) as value to `center`)
+
+        You can also scale the given point using the `scale` parameter.
+        """
+        if center is None:
+            center = self.__class__(x=0, y=0)
+
+        adj_x = self.x * scale + center.x
+        adj_y = self.y * scale + center.y
+
+        return adj_x, adj_y
+
     def draw(
         self,
         surface: pygame.Surface,
-        position: t.List[NUMBER] = None,
-        color: Colors.ColorType = Colors.WHITE,
+        center: "Point2D" = None,
+        scale: NUMBER = 1,
         size: NUMBER = 5,
-        scale: NUMBER = 1
+        color: Colors.ColorType = Colors.WHITE,
     ) -> None:
         """
         Draw the point onto pygame `surface`,
-        - use `position` as a true center position of given point as pygame center isn't in
-        true screen center (i.e. to center object pass fix=[WIDTH//2, HEIGHT//2]).
+        - use `center` as a true center position of given point as pygame center isn't in
+        true screen center (i.e. to center object pass center=[WIDTH//2, HEIGHT//2]).
         - use `scale` to scale the point up, this will be used as a constant
         which will multiply the point on both `x` and `y` axis.
         - Use `size` for the point radius size.
         - Use `color` to specify point color.
         """
-        if position is None:
-            position = [0, 0]
+        pygame.draw.circle(surface, color, self.adjusted(center, scale), size)
 
-        pos = [self.x * scale + position[0], self.y * scale + position[1]]
-        pygame.draw.circle(surface, color, pos, size)
+    def connect(
+        self,
+        surface: pygame.Surface,
+        other: "Point2D",
+        center: "Point2D" = None,
+        scale: NUMBER = 1,
+        width: NUMBER = 1,
+        color: Colors.ColorType = Colors.WHITE,
+    ) -> None:
+        """
+        Draw a line connecting `self` point with `other` point on pygame `surface`,
+        - use `center` as a true center position of given point as pygame center isn't in
+        true screen center (i.e. to center object pass center=[WIDTH//2, HEIGHT//2]).
+        - use `scale` to scale the point up, this will be used as a constant
+        which will multiply the point on both `x` and `y` axis.
+        - Use `width` for the line width.
+        - Use `color` to specify point color.
+        """
+        start_pos = self.adjusted(center, scale)
+        end_pos = other.adjusted(center, scale)
+
+        pygame.draw.line(surface, color, start_pos, end_pos, width)
 
     def rotate(self, clockwise: bool, angle: NUMBER, origin: "Point2D" = None) -> "Point2D":
         """
@@ -67,6 +103,8 @@ class Point2D:
         In case you want to use different origin than (0, 0),
         you can specify `origin` which will be a `Point2D` object.
         """
+        angle *= pi / 180  # Convert to radians
+
         if origin is None:
             origin = self.__class__(x=0, y=0)
 
@@ -150,6 +188,8 @@ class Point3D:
         In case you want to use different origin than (0, 0, 0),
         you can specify `origin` which will be a `Point3D` object.
         """
+        angle *= pi / 180  # Convert to radians
+
         if origin is None:
             origin = self.__class__(x=0, y=0, z=0)
 
