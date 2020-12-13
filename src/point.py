@@ -109,7 +109,7 @@ class Point2D:
             origin = self.__class__(x=0, y=0)
 
         rotation_matrix = Matrix.get_2d_rotation_matrix(clockwise, angle)
-        rotated_matrix = rotation_matrix * (self.matrix - origin.matrix) + origin.matrix
+        rotated_matrix = rotation_matrix @ (self.matrix - origin.matrix) + origin.matrix
         return self.__class__(rotated_matrix[0, 0], rotated_matrix[1, 0])
 
     def __repr__(self) -> str:
@@ -194,7 +194,7 @@ class Point3D:
             origin = self.__class__(x=0, y=0, z=0)
 
         rotation_matrix = Matrix.get_3d_rotation_matrix(axis, angle)
-        rotated_matrix = rotation_matrix * (self.matrix - origin.matrix) + origin.matrix
+        rotated_matrix = rotation_matrix @ (self.matrix - origin.matrix) + origin.matrix
         return self.__class__(rotated_matrix[0, 0], rotated_matrix[1, 0], rotated_matrix[2, 0])
 
     def __repr__(self) -> str:
