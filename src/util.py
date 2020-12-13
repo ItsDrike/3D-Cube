@@ -2,6 +2,9 @@ import random
 import typing as t
 
 
+NUMBER = t.Union[float, int]
+
+
 def number_remap(
     value: float,
     old_min: float,
