@@ -12,7 +12,7 @@ class BasePoint:
         self.matrix = Matrix([[point] for point in points])
 
     @property
-    def dimensions(self):
+    def dimensions(self) -> int:
         return self.matrix.shape[0]
 
     def distance(self, other: "BasePoint") -> NUMBER:
