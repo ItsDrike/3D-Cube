@@ -112,6 +112,9 @@ class Point2D:
         rotated_matrix = rotation_matrix @ (self.matrix - origin.matrix) + origin.matrix
         return self.__class__(rotated_matrix[0, 0], rotated_matrix[1, 0])
 
+    def __getitem__(self, index: int) -> NUMBER:
+        return self.matrix[index, 0]
+
     def __repr__(self) -> str:
         return f"<2D Point (x={self.x},y={self.y})>"
 
@@ -196,6 +199,9 @@ class Point3D:
         rotation_matrix = Matrix.get_3d_rotation_matrix(axis, angle)
         rotated_matrix = rotation_matrix @ (self.matrix - origin.matrix) + origin.matrix
         return self.__class__(rotated_matrix[0, 0], rotated_matrix[1, 0], rotated_matrix[2, 0])
+
+    def __getitem__(self, index: int) -> NUMBER:
+        return self.matrix[index, 0]
 
     def __repr__(self) -> str:
         return f"<3D Point (x={self.x},y={self.y},z={self.z})>"
