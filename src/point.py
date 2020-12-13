@@ -216,7 +216,22 @@ class Point3D(BasePoint):
         perspective_scale = 1 / (distance - self.z)
         return self.project(scale=perspective_scale)
 
-    def rotate(self, axis: t.Literal["x", "y", "z"], angle: NUMBER, origin: "Point3D" = None) -> "Point3D":
+    def rotated(self, axis: t.Literal["x", "y", "z"], angle: NUMBER, origin: "Point3D" = None) -> "Point3D":
+        """
+        Return Rotated point along given `axis` with specified `angle`.
+        In case you want to use different origin than (0, 0, 0),
+        you can specify `origin` which will be a `Point3D` object.
+        """
+        angle *= pi / 180  # Convert to radians
+
+        if origin is None:
+            origin = self.__class__(x=0, y=0, z=0)
+
+        rotation_matrix = Matrix.get_3d_rotation_matrix(axis, angle)
+        rotated_matrix = rotation_matrix @ (self.matrix - origin.matrix) + origin.matrix
+        return self.__class__(rotated_matrix[0, 0], rotated_matrix[1, 0], rotated_matrix[2, 0])
+
+    def rotate(self, axis: t.Literal["x", "y", "z"], angle: NUMBER, origin: "Point3D" = None) -> None:
         """
         Rotate point along given `axis` with specified `angle`.
         In case you want to use different origin than (0, 0, 0),
@@ -229,7 +244,7 @@ class Point3D(BasePoint):
 
         rotation_matrix = Matrix.get_3d_rotation_matrix(axis, angle)
         rotated_matrix = rotation_matrix @ (self.matrix - origin.matrix) + origin.matrix
-        return self.__class__(rotated_matrix[0, 0], rotated_matrix[1, 0], rotated_matrix[2, 0])
+        self.matrix = rotated_matrix
 
     def __repr__(self) -> str:
         return f"<3D Point (x={self.x},y={self.y},z={self.z})>"
