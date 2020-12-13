@@ -1,5 +1,5 @@
 import typing as t
-from math import pi
+from math import pi, sqrt
 
 import pygame
 
@@ -7,12 +7,63 @@ from src.matrix import Matrix
 from src.util import Colors, NUMBER
 
 
-class Point2D:
+class BasePoint:
+    def __init__(self, *points):
+        self.matrix = Matrix([[point] for point in points])
+
+    @property
+    def dimensions(self):
+        return self.matrix.shape[0]
+
+    def distance(self, other: "BasePoint") -> NUMBER:
+        """Calculate euclidean distance between 2 points"""
+        if self.dimensions != other.dimensions:
+            raise ValueError(
+                f"Distance can only be obtained from points with same dimensions ({self.dimensions} != {other.dimensions})"
+            )
+
+        distance = 0
+        for i in range(self.dimensions):
+            distance += abs(self[i] + other[i]) ** 2
+
+        return sqrt(distance)
+
+    def adjusted(self, center: "BasePoint" = None, scale: NUMBER = 1) -> t.List[NUMBER]:
+        """
+        Adjust given point by using `center` as a true center position of given point.
+        This is here because there may be situations where you don't want your center to be
+        at 0 along all of the dimensions.
+
+        You can also scale the given point using the `scale` parameter.
+        """
+        if center is None:
+            center = self.__class__(*(0, ) * self.dimensions)
+
+        adj_coords = []
+        for index, coord in enumerate(self):
+            adj_coords.append(coord * scale + center[index])
+
+        return adj_coords
+
+    def __getitem__(self, index: int) -> NUMBER:
+        if index >= 0 and index <= self.dimensions:
+            return self.matrix[index, 0]
+        else:
+            raise IndexError(f"Index out of range, this point only has {self.dimensions} dimensions.")
+
+    def __iter__(self) -> t.Iterator:
+        for i in range(self.dimensions):
+            yield self[i]
+
+    def __repr__(self) -> str:
+        return f"<Point {list(self)}>"
+
+
+class Point2D(BasePoint):
     def __init__(self, x: NUMBER, y: NUMBER):
+        super().__init__(x, y)
         self.x = x
         self.y = y
-
-        self.matrix = Matrix([[x], [y]])
 
     def __setattr__(self, name: str, value: t.Any) -> None:
         """
@@ -38,22 +89,6 @@ class Point2D:
             super().__setattr__("y", value[1, 0])
 
         super().__setattr__(name, value)
-
-    def adjusted(self, center: "Point2D" = None, scale: NUMBER = 1) -> t.Tuple[NUMBER, NUMBER]:
-        """
-        Adjust given point by using `center` as a true center position of given point.
-        This is here because pygame center isn't a true screen center (to obtain true
-        center position in pygame, use Point2D(WIDTH//2, HEIGHT//2)) as value to `center`)
-
-        You can also scale the given point using the `scale` parameter.
-        """
-        if center is None:
-            center = self.__class__(x=0, y=0)
-
-        adj_x = self.x * scale + center.x
-        adj_y = self.y * scale + center.y
-
-        return adj_x, adj_y
 
     def draw(
         self,
@@ -112,20 +147,16 @@ class Point2D:
         rotated_matrix = rotation_matrix @ (self.matrix - origin.matrix) + origin.matrix
         return self.__class__(rotated_matrix[0, 0], rotated_matrix[1, 0])
 
-    def __getitem__(self, index: int) -> NUMBER:
-        return self.matrix[index, 0]
-
     def __repr__(self) -> str:
         return f"<2D Point (x={self.x},y={self.y})>"
 
 
-class Point3D:
+class Point3D(BasePoint):
     def __init__(self, x: NUMBER, y: NUMBER, z: NUMBER):
+        super().__init__(x, y, z)
         self.x = x
         self.y = y
         self.z = z
-
-        self.matrix = Matrix([[x], [y], [z]])
 
     def __setattr__(self, name: str, value: t.Any) -> None:
         """
@@ -199,9 +230,6 @@ class Point3D:
         rotation_matrix = Matrix.get_3d_rotation_matrix(axis, angle)
         rotated_matrix = rotation_matrix @ (self.matrix - origin.matrix) + origin.matrix
         return self.__class__(rotated_matrix[0, 0], rotated_matrix[1, 0], rotated_matrix[2, 0])
-
-    def __getitem__(self, index: int) -> NUMBER:
-        return self.matrix[index, 0]
 
     def __repr__(self) -> str:
         return f"<3D Point (x={self.x},y={self.y},z={self.z})>"
