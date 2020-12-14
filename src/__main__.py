@@ -4,6 +4,8 @@ import pygame
 from loguru import logger
 
 from src.config import Window
+from src.cube import Cube
+from src.point import Point2D
 from src.util import Colors
 
 
@@ -33,6 +35,16 @@ class Game:
         """
         self.surface.fill(Colors.GREY)
 
+        self.cube.draw(
+            self.surface,
+            projection_distance=5,
+            scale=500,
+            point_size=5,
+            point_color=Colors.WHITE,
+            side_width=2,
+            side_color=Colors.RED,
+        )
+
     def update_screen(self, tick: bool = True) -> None:
         """
         Update the screen accordingly to `redraw_screen`
@@ -52,9 +64,16 @@ class Game:
     def main(self) -> None:
         # Initial setup
         logger.info("Starting game")
+        self.cube = Cube(
+            middle=Point2D(self.width / 2, self.height / 2),
+            radius=1
+        )
 
         # Main game loop
         while self.running:
+            self.cube.rotate("x", 1)
+            self.cube.rotate("y", 1)
+            self.cube.rotate("z", 1)
             self.update_screen()
 
 
