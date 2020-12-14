@@ -60,14 +60,13 @@ class Cube:
     def draw(
         self,
         surface: pygame.Surface,
-        projection_distance: NUMBER = 5,
+        projected_shape: t.List[Point2D],
         scale: NUMBER = 1,
         point_size: NUMBER = 5,
         point_color: Colors.ColorType = Colors.WHITE,
         side_width: NUMBER = 2,
         side_color: Colors.ColorType = Colors.RED
     ) -> None:
-        projected_shape = self.perspective_project(projection_distance)
         edges = self.edges_2d(projected_shape)
 
         for point in projected_shape:

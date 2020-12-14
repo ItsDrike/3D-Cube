@@ -3,7 +3,7 @@ from contextlib import suppress
 import pygame
 from loguru import logger
 
-from src.config import Window
+from src.config import Simulation, Window
 from src.cube import Cube
 from src.point import Point2D
 from src.util import Colors
@@ -35,10 +35,17 @@ class Game:
         """
         self.surface.fill(Colors.GREY)
 
+        if Simulation.orthographic:
+            projected_shape = self.cube.orthographic_project()
+            scale = Simulation.cube_scale
+        else:
+            projected_shape = self.cube.perspective_project(Simulation.projection_distance)
+            scale = Simulation.cube_scale * Simulation.projection_distance
+
         self.cube.draw(
             self.surface,
-            projection_distance=5,
-            scale=500,
+            projected_shape=projected_shape,
+            scale=scale,
             point_size=5,
             point_color=Colors.WHITE,
             side_width=2,

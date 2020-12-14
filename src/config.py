@@ -66,3 +66,11 @@ class Window(metaclass=YAMLGetter):
     tick_rate: int
     height: int
     width: int
+
+
+class Simulation(metaclass=YAMLGetter):
+    section = "simulation"
+
+    cube_scale: int
+    projection_distance: int
+    orthographic: bool

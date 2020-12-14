@@ -3,3 +3,7 @@ window:
     width: 800
     tick_rate: 30
 
+simulation:
+    cube_scale: 100
+    projection_distance: 5
+    orthographic: False
